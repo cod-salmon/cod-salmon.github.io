@@ -6,5 +6,3 @@ nav_order: 2
 ---
 
 # Low-Latency App
-
-aaaaaaa

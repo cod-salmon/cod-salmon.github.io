@@ -3,3 +3,6 @@ description: A collection of brief explanations of code.
 theme: just-the-docs
 
 url: https://cod-salmon.github.io/
+
+math: katex
+

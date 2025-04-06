@@ -7,4 +7,3 @@ nav_order: 3
 
 # Klang Synthesizer
 
-aaaaa
