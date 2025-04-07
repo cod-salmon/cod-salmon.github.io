@@ -44,7 +44,7 @@ $$
 
 -- that is, their set is bounded. The collection of $$\beta_j$$ as a function of $$j$$ is called the \textit{impulse response function}. 
 
-Setting the betas so that $$\beta_j=0.4$$, $$\beta_{j-1}=\beta_{j+1}=0.25$$ and $$\beta_{j-2}=\beta_{j+2}=0.05$$ makes up a low-pass filter (LPF). On the other hand, setting the betas so that $$\beta_j=1$$, $$\beta_{j-1}=\beta_{j+1}=-0.5$$ makes up a high-pass filter (HPF). As shown in the figure on the left, passing the input signal through a LPF "cleans-up" the signal. Parallely, passing the input signal through a HPF would only keep its noise, as shown on the right.
+Setting the betas so that $$\beta_j=0.4$$, $$\beta_{j-1}=\beta_{j+1}=0.25$$ and $$\beta_{j-2}=\beta_{j+2}=0.05$$ makes up a low-pass filter (LPF). On the other hand, setting the betas so that $$\beta_j=1$$, $$\beta_{j-1}=\beta_{j+1}=-0.5$$ makes up a high-pass filter (HPF). As shown in the figure on the left, passing the input signal through a LPF "cleans-up" a bit the signal. Parallely, passing the input signal through a HPF only keeps its noise, as shown on the right.
 
 
 LPF                        | HPF
