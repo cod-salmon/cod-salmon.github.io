@@ -14,3 +14,4 @@ The aim by following his code was:
 * to learn about digital trading ecosystems.
 
 I believe the goals have been achieved and I am confident of the reasons and ways of doing of the code.
+Note: apart from extra comments, I've written an additional Markdown file per `.hpp`/`.cpp` pair explaining the respective class and its implementation.
