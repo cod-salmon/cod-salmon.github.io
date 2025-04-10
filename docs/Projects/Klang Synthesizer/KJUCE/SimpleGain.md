@@ -1,11 +1,13 @@
 ---
-title: SimpleGain in JUCE
+title: Simple gain slider
 parent: JUCE through Klang
 layout: home
 nav_order: 1
 ---
+# Simple gain slider
+Here I write about how to write a simple gain slider; first, in JUCE; then, in JUCE but through Klang's simple gain dial, defined at `SimpleGain.k`.
 
-# JUCE simple gain slider
+## JUCE simple gain slider
 When you launch a new Plugin project `SimpleGain` in JUCE, it generates a new folder, where specified, containing the following:
 * a `<path>/SimpleGain/Builds` folder
 * a `<path>/SimpleGain/JuceLibraryCode` folder
@@ -132,3 +134,59 @@ To test the plug-in in Ableton I do the following:
 4. Add plug-in into a random sample:
     ![](./../../../../pics/klang-synthesizer/juce/ableton-plugin-here.PNG) ![](./../../../../pics/klang-synthesizer/juce/juce-gain-ableton.PNG)
 
+## JUCE simple gain slider through [Klang](https://github.com/nashaudio/klang)
+In branch `klang-plugin-juce/SimpleGain`, commit `e4969cc`, I managed to have the same gain slider described above running through Klang.
+
+### Changes in the `PluginProcessor.h`
+We include `klang.h`, which enables us to use the Klang language inside JUCE, using their common C++ framework; and we include `SimpleGain.k`, which implements a Gain dial with minimum value of 0.0f, maximum value of 2.0f and default value of 0.25f. Then we add a `SimpleGain` instance called `kgain` as a new member variable of the `SimpleGainAudioProcessor` class.
+### Changes in the `SimpleGainAudioProcessor` constructor
+Instead of defining the values inside the constructor, we retrieve the parameter values from `kgain`'s Klang `Controls`:
+```
+//addParameter (new juce::AudioParameterFloat ("gain", "Gain", 0.0f, 1.0f, 1.0f));
+//juce::AudioProcessorParameter * parameter = new juce::AudioParameterFloat ("gain", "Gain", 0.0f, 1.0f, 1.0f);
+//addParameter(parameter);
+
+// Register Klang SimpleGain's parameters instead
+const klang::Control& control = kgain.controls[0];
+addParameter(new juce::AudioParameterFloat(0, control.name.c_str(), control.min, control.max, control.initial));
+```
+
+### Changes in the `processBlock`
+We don't want to process the input audio in JUCE, but we want JUCE to pass the input audio to Klang, so that it processes it accordingly. Therefore we write:
+```
+void SimpleGainAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+{
+    /* // Obtain total number of input channels
+    auto totalNumInputChannels  = getTotalNumInputChannels();
+
+    // Obtain the value for the gain parameter
+    juce::AudioProcessorParameter* gainParameter = getParameters()[0];
+    float gain = gainParameter->getValue();
+    // Loop over each of them
+    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    {
+        // Obtain the right float chain for the given channel
+        float* channelData = buffer.getWritePointer (channel);
+        // Loop over the float chain for the given channel, and
+        //  for each float in the float chain, multiply it by 0.2.
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+            channelData[i] *= gain;
+    } */
+
+    // Update the Klang Synth's parameters (may have changed)
+    for (unsigned int c = 0; c < kgain.controls.size(); c++)
+        kgain.controls[c].set(getParameters()[c]->getValue());
+
+    // Setup the buffers for processing in Klang
+    klang::buffer left(buffer.getWritePointer(0), buffer.getNumSamples());
+    klang::buffer right(buffer.getWritePointer(1), buffer.getNumSamples());
+    
+    // Process buffers in Klang's SimpleGain
+    kgain.klang::Effect::process(left);
+    kgain.klang::Effect::process(right);
+}
+```
+
+One should now be able to use a Gain slider in Ableton (following the process described above) that goes from 0.0f to 2.0f and defaults to 0.25f:
+
+![](./../../../../pics/klang-synthesizer/juce/kgain-slider-automatic-gui.PNG)

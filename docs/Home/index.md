@@ -4,4 +4,4 @@ layout: home
 nav_order: 1
 permalink: /
 ---
-This is a Github Pages to collect a bit of what I have learnt/worked on since November 2024, when I started working on the projects here discussed.
+This is a Github Pages to collect a bit of what I have learnt/worked on since November 2024.
