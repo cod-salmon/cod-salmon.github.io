@@ -16,3 +16,6 @@ vendor/
 
 # Ignore docker files
 Dockerfile
+
+# Ignore any vscode settings
+.vscode

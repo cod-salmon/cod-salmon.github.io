@@ -2,7 +2,7 @@
 title: KEffect.k in JUCE
 parent: JUCE through Klang
 layout: home
-nav_order: 1
+nav_order: 2
 ---
 
 # KEffect.k in JUCE
