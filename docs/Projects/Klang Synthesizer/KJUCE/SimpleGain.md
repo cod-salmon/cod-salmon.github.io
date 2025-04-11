@@ -190,3 +190,125 @@ void SimpleGainAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 One should now be able to use a Gain slider in Ableton (following the process described above) that goes from 0.0f to 2.0f and defaults to 0.25f:
 
 ![](./../../../../pics/klang-synthesizer/juce/kgain-slider-automatic-gui.PNG)
+
+
+
+# JUCE simple gain slider with `AudioProcessorValueTreeState`
+
+Before, in the `SimpleGain` branch at commits `0ac42b1` and `e4969cc`, we were using an automatically generated GUI - i.e., in `PluginProcessor.cpp` we would have:
+```
+juce::AudioProcessorEditor* SimpleDelayAudioProcessor::createEditor()
+{
+    //return new SimpleDelayAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
+}
+```
+However, when we don't want the generic editor, we can use our own `SimpleDelayAudioProcessorEditor`. That's when we need to modify the `PluginEditor.h` and `PluginEditor.cpp` files. In these, we will keep the GUI components and a way of linking them to our parameters in the `PluginProcessor` files.
+
+## The [`AudioProcessorValueTreeState`](https://docs.juce.com/master/classAudioProcessorValueTreeState.html#details) class
+It is common to find an additional  `AudioProcessorValueTreeState` instance as a member variable of the AudioProcessor class (like our `SimpleGainAudioProcessor`). This `AudioProcessorValueTreeState` instance keeps track of the processor's state and all the parameters that control it. Therefore, one mainly needs to specify (1) the audio processor and (2) the `ParameterLayout` in order to specify the `AudioProcessorValueTreeState` instance:
+![](./../../../../pics/klang-synthesizer/juce/value-tree-state-doc.PNG)
+
+The `ParameterLayout` is simply a class within the `AudioProcessorValueTreeState` that allows to keep a collection of `RangedAudioParameters` together, so that they can be passed onto the `AudioProcessorValueTreeState` constructor. Note that all the `AudioParameterFloat`, `AudioParameterInt`, `AudioParameterBool` and `AudioParameterChoice` are `RangedAudioParameter`-derived classes.
+
+One example on how to instantiate a `ParameterLayout` instance is:
+```
+juce::AudioProcessorValueTreeState::ParameterLayout layout = { 
+    std::make_unique<AudioParameterFloat> ("a", "Parameter A", NormalisableRange<float> (-100.0f, 100.0f), 0),
+    std::make_unique<AudioParameterInt> ("b", "Parameter B", 0, 5, 2) 
+}
+```
+
+A way of passing a `ParameterLayout` instance onto the `AudioProcessor` constructor is by implementing a `createParameterLayout` method within the `AudioProcessor` class that would `add` the parameters into a layout and return it afterwards:
+```
+AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
+{
+    AudioProcessorValueTreeState::ParameterLayout layout;
+ 
+    for (int i = 1; i < 9; ++i)
+        layout.add (std::make_unique<AudioParameterInt> (String (i), String (i), 0, i, 0));
+ 
+    return layout;
+}
+
+YourAudioProcessor()
+    : apvts (*this, &undoManager, "PARAMETERS", createParameterLayout())
+{
+}
+
+```
+Another way is by explicitly initialising the layout everytime the `AudioProcessor` constructor gets called:
+```
+YourAudioProcessor()
+    : apvts (*this, &undoManager, "PARAMETERS",
+             { std::make_unique<AudioParameterFloat> ("a", "Parameter A", NormalisableRange<float> (-100.0f, 100.0f), 0),
+               std::make_unique<AudioParameterInt> ("b", "Parameter B", 0, 5, 2) })
+```
+For the changes in the branch `SimpleGain` in commit `13da038`, that is what we do:
+```
+SimpleGainAudioProcessor::SimpleGainAudioProcessor()
+#ifndef JucePlugin_PreferredChannelConfigurations
+     : AudioProcessor (BusesProperties()
+                     #if ! JucePlugin_IsMidiEffect
+                      #if ! JucePlugin_IsSynth
+                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
+                      #endif
+                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
+                     #endif
+                       ), apvts (*this, 
+                                 nullptr, 
+                                 "STATE", 
+                                 {std::make_unique<juce::AudioParameterFloat> ("gain", "Gain",  0.0f, 1.0f, 0.5f)}
+                                )
+#endif
+{   
+}
+```
+Now everytime the `SimpleGainAudioProcessor` constructor gets called, it initialises its `AudioProcessorValueTreeState` instance with name `apvts`, to contain an `AudioParameterFloat` called "Gain", with parameter ID "gain", with minimum value of 0.0f, maximum value of 1.0f and defualt value of 0.5g. Note, the `apvts` instance has been declared as a public member variable of the `SimpleGainAudioProcessor` class.
+
+## The `AudioProcessorValueTreeState::SliderAttachment` class
+Among other classes defined within the `AudioProcessorValueTreeState` are the "attachments": `SliderAttachment`, `ComboBoxAttachment` and `ButtonAttachment`. These classes are there to link GUI components to the parameters in the `AudioProcessorValueTreeState`. For instance, a `SliderAttachment` maintains a connection between a `Slider` and a parameter in the `AudioProcessorValueTreeState`. To specify a `AudioProcessorValueTreeState::SliderAttachment` thus, one needs: a reference to the `AudioProcessorValueTreeState`, the parameter ID for the parameter that we wanna link; and finally, a reference to the `Slider` instance that we want to link the parameter to. 
+
+While the `AudioProcessorValueTreeState` instance resides within the `AudioProcessor` class, the attachment (i.e., a `AudioProcessorValueTreeState::SliderAttachment` instance called `gainSliderAttachment`) is placed inside the `AudioProcessorEditor` class, together with the GUI component (i.e., a `Slider` instance called `gainSlider`). This is important, as the  `SliderAttachment` links the `Slider` to the gain parameter in the `apvts`. We must make sure that the lifetimes of both `gainSlider` and `gainSliderAttachment` are the same and that, when destroyed, the link maintained through `gainSliderttachment` disappears before the objects that it links.
+
+The `gainSliderAttachment` instance gets initialised during the construction of the `SimpleGainAudioProcessorEditor` (which, at the same time, gets called in the `SimpleDelayAudioProcessor::createEditor` method):
+```
+SimpleGainAudioProcessorEditor::SimpleGainAudioProcessorEditor (SimpleGainAudioProcessor& p)
+    : AudioProcessorEditor (&p), audioProcessor (p), 
+    gainSliderAttachment (p.apvts, "gain", gainSlider)
+{
+    gainSlider.setSliderStyle (juce::Slider::SliderStyle::LinearVertical);
+    gainSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, true, 200, 30);
+    addAndMakeVisible (gainSlider);
+    
+    // Make sure that before the constructor has finished, you've set the
+    // editor's size to whatever you need it to be.
+    setSize (400, 300);
+}
+```
+In the `SimpleGainAudioProcessorEditor` we also set the style of our `gainSlider`. In this case, we want the slider to be vertical and have a text box below showing the value of the gain.
+
+Finally, we implement the `SimpleGainAudioProcessorEditor::paint` and `SimpleGainAudioProcessorEditor::resized` method a little so that (1) we set the gain slider to take up the whole GUI window, and (2) set its background color to black.
+
+![](./../../../../pics/klang-synthesizer/juce/ableton-notsosimple-gain-plugin.PNG)
+
+## Setting and retrieving the audio processor's state
+Once we have a `AudioProcessorValueTreeState` instance in our `AudioProcessor` class, we can implement the  `AudioProcessor::setStateInformation` and `AudioProcessor::getStateInformation` methods. These allow the user to save the plugin's state once he/she is happy with the settings; and similarly, to initialise the plugin with the saved settings when restarting a session. The `AudioProcessor::getStateInformation` is passed a reference to a `MemoryBlock` called `destData`. This is where the `AudioProcessorValueTreeState` data is copied onto. Reversely, in `AudioProcessor::setStateInformation`, a bunch of `data` of size `sizeInBytes` is converted into Xml, and from Xml, a new `AudioProcessorValueTreeState` is obtained to replace the current `AudioProcessorValueTreeState`:
+```
+void SimpleDelayAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+{
+    // Takes the AudioProcessorValueTreeState instance that we declared 
+    //  in the AudioProcessor's class and passes its data onto destData
+    if (auto xmlState = apvts.copyState().createXml())
+        copyXmlToBinary (*xmlState, destData);
+}
+
+void SimpleDelayAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+{
+    // Gets pointer to "data" and its size "sizeInBytes", converts it into Xml
+    //  and from Xml, we obtain a new AudioProcessorValueTreeState with which
+    //  to replace our current AudioProcessorValueTreeState state.
+    if (auto xmlState = getXmlFromBinary (data, sizeInBytes))
+        apvts.replaceState (juce::ValueTree::fromXml (*xmlState));
+}
+```
