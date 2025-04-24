@@ -1,8 +1,8 @@
 ---
 title: Introduction to the Digital Trading Environment
-parent: Low-Latency App
+parent: Low-Latency Trading
 layout: home
-nav_order: 1
+nav_order: 2
 ---
 
 # Introduction to the Limit Order Book
