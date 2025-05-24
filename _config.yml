@@ -4,5 +4,8 @@ theme: just-the-docs
 
 url: https://cod-salmon.github.io/
 
+plugins:
+  - jemoji
+
 math: katex
 
