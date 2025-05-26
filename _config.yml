@@ -5,6 +5,3 @@ theme: just-the-docs
 url: https://cod-salmon.github.io/
   
 math: katex
-
-plugins:
-  - jemoji
