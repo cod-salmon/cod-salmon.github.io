@@ -7,12 +7,17 @@ nav_order: 3
 
 ### Content in progres...
 
-# AWS IAMs
-When you create an AWS account, you begin with one sign-in identity that has complete access to all AWS services and resources in the account. This identity is called the AWS account [**root user**](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html). The AWS account can however have multiple other users interacting with its resources. Each of these users moves around the AWS account through an **IAM** (or AWS Identity and Access Management token). IAMs are setup by the root user and help him/her securely control the level of access of each of these users to the AWS resources in her/his account. AWS strongly recommends to not use the root user for your everyday tasks. Safeguard your root user credentials and use them to perform the tasks that only the root user can perform.
+# AWS IAM
+When you create an AWS account, you begin with one sign-in identity that has complete access to all AWS services and resources in the account. This identity is called the AWS account [**root user**](https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html). The AWS account can however have multiple other users interacting with its resources. 
 
-This is why, when signing in to [AWS](https://aws.amazon.com/) you are by default asked to provide you IAM user credentials. However, you can also click on "Sign in using root user email" to login as root user on the AWS account
+AWS Identity and Access Management (IAM) is a web service that helps you control the access that each of these users has on your AWS account resources.
+
+AWS strongly recommends to not use the root user for your everyday tasks. Safeguard your root user credentials and use them to perform the tasks that only the root user can perform. This is why, when signing in to [AWS](https://aws.amazon.com/) you are by default asked to provide you IAM user credentials. However, you can also click on "Sign in using root user email" to login as root user on the AWS account
 
 ![](../../../pics/llmops-aws/iam-user-signin.PNG) ![](../../../pics/llmops-aws/iam-root-signin.PNG) 
+
+# AWS CLI
+Your AWS account gives you access to various different AWS services (EC2, S3, Amazon Lightsail, Amazon CodeCatalyst, etc.). You can interact with those services via the web-based [AWS Management Console](https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/what-is.html), or via commands, by installing `aws-cli` or [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) in your command-line shell.
 
 
 # Amazon CodeCatalyst
