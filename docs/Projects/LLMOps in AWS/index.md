@@ -17,7 +17,9 @@ AWS strongly recommends to not use the root user for your everyday tasks. Safegu
 ![](../../../pics/llmops-aws/iam-user-signin.PNG) ![](../../../pics/llmops-aws/iam-root-signin.PNG) 
 
 # AWS CLI
-Your AWS account gives you access to various different AWS services (EC2, S3, Amazon Lightsail, Amazon CodeCatalyst, etc.). You can interact with those services via the web-based [AWS Management Console](https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/what-is.html), or via commands, by installing `aws-cli` or [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) in your command-line shell.
+Your AWS account gives you access to various different AWS services (EC2, S3, Amazon Lightsail, Amazon CodeCatalyst, etc.). You can interact with those services via the web-based [AWS Management Console](https://docs.aws.amazon.com/awsconsolehelpdocs/latest/gsg/what-is.html) (see below), or via commands, by installing `aws-cli` or [AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) in your command-line shell.
+
+![](../../../pics/llmops-aws/aws-browser-console.PNG)
 
 
 # Amazon CodeCatalyst
