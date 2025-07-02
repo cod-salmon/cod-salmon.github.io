@@ -1,11 +1,11 @@
 ---
-title: Simple gain slider
-parent: JUCE through Klang
+title: Simple gain slider through Klang
+parent: Learning JUCE
 layout: home
 nav_order: 1
 ---
-# Simple gain slider
-Here I write about how to write a simple gain slider; first, in JUCE; then, in JUCE but through Klang's simple gain dial, defined at `SimpleGain.k`.
+# Simple gain slider through Klang
+Here I write about how to build a simple gain slider; first, in JUCE; then, in JUCE but through Klang's simple gain dial, defined at `SimpleGain.k`.
 
 ## JUCE simple gain slider
 When you launch a new Plugin project `SimpleGain` in JUCE, it generates a new folder, where specified, containing the following:
@@ -42,11 +42,11 @@ void SimpleGainAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 }
 ```
 ### Plugin Parameters
-Parameters are how plug-in hosts control plug-ins. They are exposed as part of the plug-in format's interface - i.e., you need to specify the parameters in order to specify the plug-in:
+Parameters are how plugin hosts control plug-ins. They are exposed as part of the plugin format's interface - i.e., you need to specify the parameters in order to specify the plugin:
 ```
 MyPlugin (parameter1, parameter2, parameter3);
 ``` 
-Parameters can be changed via the plug-in's GUI - you can define the above plug-in in your code, and then have the user through the GUI (say, through some dials) setting up the values for `parameter1`, `parameter2` and `parameter3`. 
+Parameters can be changed via the plugin's GUI - you can define the above plugin in your code, and then have the user through the GUI (say, through some dials) setting up the values for `parameter1`, `parameter2` and `parameter3`. 
 
 In JUCE, parameters are held or wrapped inside the `AudioProcessorParameter` class. This class contains methods for getting and setting the parameter values and properties. Then it can be added to and managed by the AudioProcessor. Some basic types are:
 * `AudioParameterFloat`
@@ -80,7 +80,7 @@ addParameter(parameter);
 ```
 Which element the AudioProcessor decides to access when `addParameter` gets called is (probably) based on some internal variable that keeps track of the last element in the array which has been written into, so that, when `addParameter` gets called the first time, the `parameter` gets assigned to the 0th element in the array; when `addParameter` gets called a second time, the second `parameter` gets assigned to the 1st element in the array; and so on.
 
-To use one of the plug-in's parameters in `processBlock`, we can therefore use the `getParameters` method from the `AudioProcessor` class:
+To use one of the plugin's parameters in `processBlock`, we can therefore use the `getParameters` method from the `AudioProcessor` class:
 1. by specifying the parameter that we want out of the array of `AudioProcessorParameter` pointers (e.g., `getParameters()[0]` for the first parameter that we added); and
 2. by calling `AudioProcessorParameter::getValue` method, which returns the parameter value wrapped inside the `AudioProcessorParameter` class:
 ```
@@ -120,18 +120,18 @@ juce::AudioProcessorEditor* SimpleGainAudioProcessor::createEditor()
     return new juce::GenericAudioProcessorEditor (*this);
 }
 ```
-which will look at the AudioProcessor that you pass to it, it will look at the types of parameters that you registered in the Audioprocessor and then decide and build for you the right interface for them (for example, it might build a slider for the gain parameter). The code up in branch `SimpleGain`, up to the commit with number `0ac42b1` will show the following plug-in GUI:
+which will look at the AudioProcessor that you pass to it, it will look at the types of parameters that you registered in the Audioprocessor and then decide and build for you the right interface for them (for example, it might build a slider for the gain parameter). The code up in branch `SimpleGain`, up to the commit with number `0ac42b1` will show the following plugin GUI:
 
 ![](./../../../../pics/klang-synthesizer/juce/gain-slider-automatic-gui.PNG)
 
-To test the plug-in in Ableton I do the following:
+To test the plugin in Ableton I do the following:
 1. Build the VST3 file on JUCE:
     ![](./../../../../pics/klang-synthesizer/juce/build-vst3.PNG) 
 2. Go to  `C:\<path>\JUCE-projects\klang-plugin-juce\Builds\VisualStudio2022\x64\Debug\VST3\klang-plugin-juce.vst3\Contents\x86_64-win`, copy the `klang-plugin-juce.vst3` file and bring it into `C:\Program Files\Common Files\VST3`:
     ![](./../../../../pics/klang-synthesizer/juce/ableton-vst3-loc.PNG)
 3. Tell Ableton to look into that folder for plug-ins:
     ![](./../../../../pics/klang-synthesizer/juce/ableton-plugin-folder-on.PNG)
-4. Add plug-in into a random sample:
+4. Add plugin into a random sample:
     ![](./../../../../pics/klang-synthesizer/juce/ableton-plugin-here.PNG) ![](./../../../../pics/klang-synthesizer/juce/juce-gain-ableton.PNG)
 
 ## JUCE simple gain slider through [Klang](https://github.com/nashaudio/klang)
