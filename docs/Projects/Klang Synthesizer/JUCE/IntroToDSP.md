@@ -5,7 +5,7 @@ layout: home
 nav_order: 2
 ---
 
-### [Tutorial: Introduction to DSP](https://juce.com/tutorials/tutorial_dsp_introduction/), more explained.
+# [Tutorial: Introduction to DSP](https://juce.com/tutorials/tutorial_dsp_introduction/), more explained.
 
 (see https://github.com/cod-salmon/learning-juce/tree/introToDSP for the code referenced below)
 
