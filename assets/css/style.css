@@ -1,0 +1,603 @@
+/*-----------------------------------------------------------------------------*/
+/*------------------------------- GENERAL SETTINGS ----------------------------*/
+/*-----------------------------------------------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+/* On all elements on the page, apply the following settings: */
+*{
+  margin: 0; /* remove margins*/
+  padding: 0; /* remove internal padding*/
+  box-sizing: border-box; /* make width and height include padding and border -
+  so that if (e.g.,) we set width=100px and padding=10px, element stays at 100px, instead of 120px*/
+}
+/* On all html elements apply the following settings: */
+html{
+  font-family: Poppins, 'Segoe UI', sans-serif; /*Poppins first, fallback to 'Segoe UI', then sans-serif*/
+  color: var(--text-color);
+  scroll-behavior: smooth; /*For bookmark links*/
+}
+/* On all body elements apply the following settings.
+Note body elements are always inside an html element, so 
+body will inherit properties from html*/
+body{
+  min-height: 100dvh; /*set the min height to 100% of the dynamic viewport height*/
+  background-color: var(--base-color); /* set page background color*/
+  font-size: 20px; /* font size for the body*/
+}
+/* I want padding in main to scale with viewport (7%) on wide screens,
+while having a fixed padding on narrow screens (5em in this case).
+Note here too, main elements are always inside body elements*/
+main{
+  padding-left: min(5em, 7%); /*So, if 5em is smaller than 7% of the parent container’s 
+  width, the padding will be 5em. If 7% is smaller, the padding will be 7%*/
+  padding-right: min(5em, 7%);
+  color: var(--text-color);
+}
+/* In all p elements inside a main element, apply a margin on the top*/
+main p{
+  margin-top: .35em;
+}
+/* Style button elements*/
+button{
+  border: none; /*remove browser's default button border*/
+  padding: .8em 2em; /*set internal padding*/
+  background-color: var(--base-color); /*set the button's background color*/
+  color: black; /*set the button's text color*/
+  border-radius: 4px; /*radius of the rounded corners*/
+  font: inherit; /*inherit font family from parent*/
+  text-transform: uppercase; /*set text to uppercase*/
+  font-weight: 500; /*set font weight (between normal and bold in this case)*/
+  cursor: pointer; /*show a hand cursor when hovering over*/
+}
+/*-----------------------------------------------------------------------------*/
+/*------------------------- LIGHT/DARK MODE SETTINGS --------------------------*/
+/*-----------------------------------------------------------------------------*/
+/* Note the switching between light and dark modes is handled in darkmode.js*/
+/* default palette (light-theme colours) */
+:root{
+  --base-color: white;
+  --base-variant: #e8e9ed;
+  --text-color: #111528;
+  --secondary-text: #505361;
+  --primary-color: #d5dae9;
+  --hover-color:#b3c5f3;
+
+  --code-bg: #f6f8fa;
+  --code-text: #24292f;
+  --code-border: #d0d7de;
+
+  --code-keyword: #cf222e;
+  --code-string: #0a3069;
+  --code-comment: #6e7781;
+  --code-function: #8250df;
+
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --card-shadow-hover: 0 6px 16px rgba(0,0,0,0.2);
+}
+/* alternative palette (dark-theme colours) */
+.darkmode{
+  --base-color: #0f172a;        
+  --base-variant: #1e293b;     
+  --text-color: #e2e8f0;        
+  --secondary-text: #94a3b8;    
+  --primary-color: #6366f1;     
+  --hover-color: #1f2937;       
+
+  --code-bg: #0d1117;          
+  --code-text: #c9d1d9;
+  --code-border: #30363d;
+
+  --code-keyword: #ff7b72;
+  --code-string: #a5d6ff;
+  --code-comment: #8b949e;
+  --code-function: #d2a8ff;
+
+  --card-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 4px 12px rgba(255,255,255,0.03);
+  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.5), 0 8px 24px rgba(255,255,255,0.05);
+}
+/* Adjust settings for the button with id="theme-switch" */
+#theme-switch{
+  height: 25px; /*we want a square button, so height = width*/
+  width: 25px;
+  padding: 0; /*remove inherited padding from <button> */
+  border-radius: 100%; /* make it circular shaped*/
+  display: flex; /*flex container*/
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 47px;
+  right: 95px;
+  z-index: 8;
+}
+/*Target all <svg> elements inside #theme-switch (we have two)
+Set the fill color of the SVG shapes to var(--secondary-text)*/
+#theme-switch svg{
+  fill: var(--secondary-text);
+}
+/* Hide the last SVG child inside the #theme-switch
+(the moon, so we are in light-mode by default)*/
+#theme-switch svg:last-child{
+  display: none;
+}
+/*When an ancestor has the .darkmode class, 
+hide the first SVG inside the theme switch (the sun)*/
+.darkmode #theme-switch svg:first-child{
+  display: none;
+}
+/*When an ancestor has the .darkmode class, 
+show the last SVG inside the theme switch (the moon)*/
+.darkmode #theme-switch svg:last-child{
+  display: block;
+}
+/*-----------------------------------------------------------------------------*/
+/*------------------------- CODE CONTAINER SETTINGS  --------------------------*/
+/*-----------------------------------------------------------------------------*/
+/* Classes from Highlight.js */
+.hljs-keyword  { color: var(--code-keyword); }
+.hljs-string   { color: var(--code-string); }
+.hljs-comment  { color: var(--code-comment); }
+.hljs-function { color: var(--code-function); }
+
+/* Syntax highlighters (like Highlight.js) target the <code> element.
+We style <code> on its own for inline code, and override its properties 
+when it appears inside a <pre>, to handle block-level code formatting. */
+
+/* This HTML element tells the browser: this is code */
+code {
+  font-size: 0.85em; /*a bit smaller than usual text*/
+  padding: 0.25rem 0.25rem; /* small top/bottom padding */
+  border-radius: 6px; /* rounded corners */
+  background: var(--code-bg); /* set up some background color*/
+  color: var(--code-text); /* set up some text color*/
+  white-space: break-spaces; /*preserves spaces and line breaks
+  - and allows wrapping when the line is long!*/
+}
+
+/* "pre" for pre-formatted text: this HTML element tells the browser to 
+preserve whitespaces (e.g., spaces, tabs, line breaks) */
+pre {
+  margin: 1rem 0; /* add some spacing between paragraph and code block*/
+  padding: 1rem 1rem; /* add inner spacing so that code text does not touch edges*/
+  overflow-x: auto; /* allow for horizontal scrolling when lines are too long*/
+  border-radius: 12px; /* rounded corners*/
+  background: var(--code-bg); /* same background color as <code>*/
+  color: var(--code-text); /* same text color as <code> */
+  border: 1px solid var(--code-border); /* helps to make the code block stand up from the rest*/
+}
+/* Override properties of <code> element when inside a <pre> element 
+(block code has different styling vs. inline code)*/
+pre code {
+  display: block; /* make it a block-level element*/
+  padding: 0; /* remove any padding we had before (there's already the padding from <pre>)*/
+  font-size: 0.9rem; /* make the font-size a bit bigger than when inline */
+  line-height: 1.3; /* adjust spacing between lines of code */
+  background: transparent; /* remove background from <code> and use the one from <pre>*/
+  color: inherit; /* inherit text color from <pre> */
+  margin: 0; /* remove any margins*/
+  white-space: pre; /* just make sure <code> does not override <pre> behaviour for preserving white-space*/
+}
+/*---------------------------------------------------------*/
+/* ------------- Code scroll-bar settings------------------*/
+/*---------------------------------------------------------*/
+/* FIREFOX scrollbar customization (color & width) */
+pre {
+  scrollbar-width: auto; /* default width; could use 'thin' for slimmer */
+  scrollbar-color: var(--code-text) transparent; /* thumb (draggable part) color*/
+}
+
+/*WebKit browsers (Chrome, Edge, Safari) ignore the
+scrollbar-width and scrollbar-color properties; we need
+webkit pseudoelements...*/
+
+/* WEBKIT (Chrome, Edge, Safari) */
+/* Adjust the scroll-bar area dimensions */
+pre::-webkit-scrollbar {
+  width: 12px;  /* vertical scrollbar width */
+  height: 12px; /* horizontal scrollbar height */
+}
+/* Adjust the scrollbar thumb (the draggable part) */
+pre::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--code-text) 40%, transparent);
+  border-radius: 4px; 
+}
+/* Turn the color of the scroll-bar a bit lighter when hovered on*/
+pre::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--code-text) 60%, transparent);
+}
+/*-----------------------------------------------------------------------------*/
+/*-------------------- DESKTOP MODE NAVIGATION BAR SETTINGS -------------------*/
+/*-----------------------------------------------------------------------------*/
+/*I use the header to hold two things: the theme-switch button and the navigation bar*/
+header {
+  display: flex;
+  align-items: center; /* Vertically center buttons */
+  justify-content: space-between; /* horizontally spread children so the first is 
+  left, the last is right, and there's space between.*/
+}
+/* I change nav element according to whether I want it displayed horizontally (desktop mode)
+or diplayed vertically (mobile mode). Desktop mode is the default nav setting*/
+nav {
+  margin: 80px auto 30px auto; /* add some margin top and bottom; center horizontally*/
+  background-color: var(--base-color); /* set background color of navbar*/
+  display: flex; /* make it a flex container so that it can be vertical or horizontal*/
+  justify-content: center; /* center children horizontally*/
+  align-items: center; /* center children vertically */
+  position: relative; /* need this so that we can position button absolutely inside navbar*/
+  font-size: 20px; /* set text size (HOME, POSTS, etc.)*/
+  width: 100%; /* stretch across page's full width*/
+}
+/*<ul> elements have bullet points by default, left indentation, 
+top and bottom margins and a vertical stacking layout - need to change this*/
+nav ul{
+  list-style: none; /* no bullet points please!*/
+  display: flex; /* set it to be a flex container*/
+  justify-content: center; /* and center children (in this case, li items) horizontally*/
+  margin: 0; /* remove default spacing*/
+  padding: 0; /* remove default spacing*/
+  width: 100%; /* stretch across page's full width*/
+}
+/* Each item in the <ul> element (i.e., list item)*/
+nav li{
+  display: flex; /*Don't really need this, but I guess to 
+  keep it consistent: <nav> flex, <ul> flex, <li> flex, <a> flex */
+}
+nav a{
+  display: flex; /* links work like flexible container*/
+  text-decoration: none; /* do not want underlines*/
+  color: var(--text-color); /* text color to specified in palette*/
+  padding: 1em 2em; /* some cute padding */
+  transition: background-color 150ms ease; /*How 
+  quickly the background color changes when you hover over*/
+}
+/* I add some color when hovering over tabs*/
+nav a:hover{
+  background-color: var(--hover-color);
+}
+/* When in that link, add some bottom line to it*/
+nav a.active-link{
+  border-bottom: 2px solid var(--text-color);
+}
+/*-- SIDEBAR BUTTONS --*/
+/*open-sidebar-button is a hamburger button; close-sidebar-button is a cross
+Default them to hidden (I don't want either of them when in desktop mode)*/
+#open-sidebar-button,
+#close-sidebar-button {
+  display: none;
+  background: none;
+  border: none;
+  padding: 2em;
+  cursor: pointer; /* show*/
+}
+#close-sidebar-button {
+  display: none !important; /* Forcing this; otherwise, you can see the 
+  close button in desktop mode*/
+  position: absolute; /* absolute position makes it sit in the top-right of the nav*/
+  top: 1rem; /* adjust position relative to nav */
+  right: 1rem;
+}
+#open-sidebar-button {
+  margin-left: auto; /* push the hamburger button to the 
+  right of the header container*/
+}
+#open-sidebar-button svg,
+#close-sidebar-button svg {
+  fill: var(--secondary-text); /*set the colors of the SVGs*/
+}
+/*--- OVERLAY ---*/
+/* I use this to create a semi-transparent layer on top of the page
+when the side navigation bar shows (in mobile mode)*/
+#overlay{
+  background: rgba(0, 0, 0.5, 0.5); /* darkish layer color*/
+  position: fixed; /*keep the element in place even when scrolling the page*/
+  inset: 0; /* set all offsets (top, right, left, bottom) to zero (cover the whole viewport)*/
+  z-index: 9; /* making sure the overlay is on top of everything else */
+  display: none; /* the overlay is by default invisible; only appears when the nav sidebar appears*/
+}
+/*-----------------------------------------------------------------------------*/
+/*-------------------- MOBILE MODE NAVIGATION BAR SETTINGS- -------------------*/
+/*-----------------------------------------------------------------------------*/
+/* When the screen's width is equal or lower to 700px */
+@media screen and (max-width: 700px) {
+  header {
+    flex-direction: column; /* when in mobile mode, we want the navbar vertical*/
+    align-items: flex-start;  /* align items to the left*/
+  }
+  /* nav becomes sidebar */
+  nav{
+    position: fixed; /* attach to viewport, do not move with scrolling*/
+    top: 0; /* place navbar at the top of the viewport*/
+    right: -100%; /* I move the navbar completely off the screen to hide it
+    (by default, navbar in mobile mode only shows when hamburger button is clicked.
+    right : 0; is set when the navbar is made to show.*/
+    height: 100vh; /* take full viewport height*/
+    width: min(15em, 100%); /* do not want to take full viewport's width, also not overflow*/
+    z-index: 10; /* put it on top of everything else (on top of overlay)*/
+    transition: right 300ms ease-in-out; /* add some animation for when right property changes
+    (i.e., let it slide to the left, not just appear suddenly)*/
+    flex-direction: column; /* stack list vertically*/
+    justify-content: flex-start; /* place content vertically at the top*/
+    align-items: flex-start; /* and place it horizontally to the left*/
+    padding-top: 8rem; /* leave some space between the viewport's top and the navbar */
+  }
+  /* sidebar.js will read this when openSidebar is triggered
+  (i.e., when we click the hamburger button) */
+  nav.show{
+    right: 0; /* (1) show the sidebar!*/
+  }
+  nav.show ~ #overlay{
+    display: block; /* (2) show the overlay!*/
+  }
+  nav ul{
+    width: 100%; /* stretch across the full width of the sidebar*/
+    flex-direction: column; /* need this if we don't want links to
+    try to sit horizontally*/
+  }
+  nav a{
+    width: 100%; /* stretch across the full width of <li>
+    (which fill the <ul>)*/
+    padding-left: 2.5em; /* add some padding on the left
+    so that links don't sit right on the left edge of the navbar*/
+  }
+  nav a.active-link{
+    border-bottom: none; /* don't want line at the bottom 
+    when link is clicked in mobile mode*/
+  }
+  /* Show hamburger button on mobile mode by default*/
+  #open-sidebar-button {
+    display: block;
+  }
+  /* Show close button ONLY when sidebar shows */
+  nav.show #close-sidebar-button {
+    display: block !important;
+  }
+}
+/*-----------------------------------------------------------------------------*/
+/*------------------------------ POST SETTINGS- -------------------------------*/
+/*-----------------------------------------------------------------------------*/
+/* Everytime you click a post, the main class is post-main */
+.post-main {
+  min-height: 100dvh; /*set the min height to 100% of the dynamic viewport height*/
+  background-color: var(--base-color); /* set background color*/
+  color: var(--text-color); /* set text color*/
+  font-size: 20px; /* set text size*/
+  width: 90%; /* do not want text to fill whole width of the viewport*/
+  margin: 0 auto; /* no vertical margin, center it horizontally*/
+  position: relative; /* settings this to be able to position children
+  absolutely inside it*/
+  padding-bottom: 100px; /* do not let content touch bottom edge*/
+}
+/* I use this for titles*/
+.post-main h1 {
+  text-align: center; /* center the title*/
+  padding-top: 50px; /* leave a big space at the top*/
+  padding-bottom: 20px; /* and a bit of space at the bottom */
+}
+/* I use this for subtitles*/
+.post-main h2 {
+  padding-top: 30px;
+  padding-bottom: 10px;  
+}
+.post-main p {
+  margin-bottom: 10px;
+}
+.post-main ul {
+  line-height: 1.6; /*vertical spacing between list lines*/
+  padding-left: 40px; /* add some indentation*/
+  margin-bottom: 10px;  /* add spacing after list*/
+}
+.post-main img {
+  max-width: 100%; /* expand across whole width of the container*/
+  height: auto; /* but maintaining aspect ratio...*/
+  margin-top: 20px; /* and add some top space*/
+  margin-bottom: 20px; /* and bottom space*/
+}
+/*-- EQUATIONS SETTINGS --*/
+.equation-container {
+    display: inline-block;
+    width: 100%;            /* Full width */
+    max-width: 100%;        /* Prevent overflow */
+    overflow-x: auto;       /* Horizontal scrolling */
+    white-space: nowrap;    /* Prevent line breaks in long equations */
+    font-family: 'Arial', sans-serif; /* Optional font */
+}
+/*-- IMG SETTINGS --*/
+.full-width-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+/*-----------------------------------------------------------------------------*/
+/*------------------------- POST CARD GRID SETTINGS- --------------------------*/
+/*-----------------------------------------------------------------------------*/
+/* This is a grid container of post-card items*/
+.post-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top: 30px; /* add some spacing above the grid*/
+  margin-bottom: 50px;
+  grid-gap: 60px; /* spacing between grid items*/
+}
+/* A post-card will have inside a thumbnail with an image,
+and some content (the content consisting of text and a "Read More" link*/
+.post-card {
+  background-color: var(--base-variant); /* background color is different to main
+  (to make it look like a card)*/
+  margin: 24px 0; /* vertical spacing above and below the card*/
+  padding: 16px; /* keep content away from edges*/
+  display: flex; /* flex container so that it can stack items vertically or horizontally*/
+  flex-direction: column; /* we decide to stack items vertically */
+}
+/* -- THUMBNAIL --*/
+/* Used to contain the card image */
+.post-card .thumbnail {
+  width: 100%; /* fill the width of the container*/
+  aspect-ratio: 1 / 1; /* force square*/
+  overflow: hidden; /*if image goes outside bounds, hide it*/
+}
+/*the card image settings...*/
+.post-card .thumbnail img {
+  width: 100%; /* make image fill full width of container*/
+  height: 100%; /* make image fill full height of container*/
+  object-fit: cover; /* scale up image until it fills the containing square,
+  then crop any extra parts that don't fit */
+  display: block; /* remove small gap underneath image*/
+}
+/* -- CONTENT --*/
+.post-card-content{
+  display: flex; /* this, to allow vertical stacking*/
+  flex-direction: column; /* stack the content vertically (content and "Read More"...) */
+  justify-content: space-between; /* push content to top and "Read More" to the bottom */
+  margin-top: 24px; /* space between thumbnail and content */
+  flex-grow: 1; /* Ensures the content area grows to fill available space */
+  color: var(--text-color);
+}
+/* Headings settings for post-card content */
+.post-card .post-card-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+.post-card .post-card-content h3 {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  font-weight: normal; /* Removes bold from default h3, sets font to normal */
+  margin-bottom: 10px;
+}
+/* settings for paragraph */
+.post-card .post-card-content p {
+  font-size: 1rem; /* small font-size*/
+  line-height: 1.6;
+  margin-bottom: 5px;
+}
+/* READ MORE */
+.post-card-links {
+  display: flex; /* make it a flex container (default main axis is row)*/
+  justify-content: flex-end; /* then move link to right */
+}
+.post-card-links .read-more {
+  font-size: 1rem; /* small font-size*/
+  color: #007bff; /* set a color to the link */
+  text-decoration: none; /* removes underline (add it only on hover) */
+}
+.post-card-links .read-more:hover {
+  text-decoration: underline; /* underline the link on hover */
+}
+/* Adjust the number of columns as screen's width changes*/
+@media screen and (min-width: 701px) and (max-width: 1200px) {
+  .post-card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media screen and (max-width: 700px) {
+  .post-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/*-----------------------------------------------------------------------------*/
+/*------------------------ PROJECT CARD GRID SETTINGS- ------------------------*/
+/*-----------------------------------------------------------------------------*/
+/* Column grid for project cards */
+.project-grid {
+  display: flex; /* make it a flex container so that we
+  can stack vertically/horizontally */
+  flex-direction: column; /* stack vertically*/
+  gap: 2rem; /* space between cards*/
+  margin: 2rem auto 2rem auto; /* center grid horizontally but
+  have some space on top*/
+  padding: 1rem;
+}
+/* a project card */
+.project-card {
+  display: flex; /* flex container, default to row direction*/
+  flex-direction: row; /* image left, content right */
+
+  width: 800px; /* set a fixed width*/
+  max-width: 100%; /* to prevent overflow*/
+  margin: 0 auto; /* no top/bottom margin, center card horizontally */
+  
+  background-color: var(--base-variant); /*set background color*/
+  border-radius: 8px; /* add some rounding to the corners*/
+  overflow: hidden; /* hide things outside card's boundaries
+  (e.g., the image past rounded corners)*/
+  box-shadow: var(--card-shadow); /* add some shadow*/
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+/* lift up the card when hovering*/
+.project-card:hover {
+  box-shadow: var(--card-shadow-hover); /*change the shadow color*/
+  transform: translateY(-5px); /*move the card a bit up*/
+}
+/*-- THUMBNAIL --*/
+.project-card .thumbnail {
+  width: 200px; /* set a fixed width to thumbnail*/
+  aspect-ratio: 1 / 1; /* make it square*/
+  overflow: hidden; /* make sure things that go outside its bounds are hidden*/
+}
+.project-card .thumbnail img {
+  width: 100%; /*expand the whole width*/
+  height: 100%; /*expand the whole height*/
+  object-fit: cover; /*try to fit the image, to the bounds
+  without distortion*/
+  display: block; /* remove gaps underneath the image*/
+}
+/*-- CARD CONTENT --*/
+.project-card .project-card-content {
+  padding: 1rem; /* some padding, why not*/
+  flex: 1; /* fill remaining width */
+  display: flex; /* making it a flex container so that we
+  can stack elements vertically*/
+  flex-direction: column; /*stack elements vertically
+  (headings, paragraphs, etc.)*/
+  justify-content: space-between; /*spread out elements in stack*/
+}
+/* Style the content - nothing crrazy here*/
+/* Heading settings for post-card content */
+.project-card .project-card-content h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+.project-card .project-card-content h3 {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  font-weight: normal; /* remove bold from default h3*/
+  margin-bottom: 10px;
+}
+/* settings for paragraph */
+.project-card .project-card-content p {
+  font-size: 1rem; /* small font-size*/
+  line-height: 1.6;
+  margin-bottom: 5px;
+}
+/* When image is less than 700px, arrange project card vertically,
+with image on top and content and links below*/
+@media (max-width: 700px) {
+  .project-card {
+    flex-direction: column; 
+  }
+  .project-card .thumbnail {
+    width: 100%; /* set image to full width */
+    aspect-ratio: 1 / 1; /*keep it square*/
+  }
+}
+/*---------- LINKS ---------*/
+/* Container to align links horizontally */
+.links {
+  display: flex; /* make it a flex container, default main axis row*/
+  gap: 16px; /* adjust space between links*/
+  align-self: flex-end; /* align links to right*/
+}
+/* Shared link styles (both for post cards and project cards) */
+.links a {
+  font-size: 1rem; /* small font-size*/
+  text-decoration: none; /* removes underline (add it only on hover) */
+}
+/* Underline links when hovering over */
+.links a:hover {
+  text-decoration: underline;
+}
+/* "Read More" link*/
+.links a.read-more {
+  color: #007bff; /* set a color to the link */
+}
+/* "GitHub" link */
+.links a.github-link {
+  color: var(--text-color); /* GitHub brand dark gray */
+}
