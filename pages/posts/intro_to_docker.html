@@ -34,7 +34,7 @@
 
   <h2 style="display:flex; align-items:center; gap:20px;">
   1. The Docker file
-  <img src="../../assets/images/dockerfile.png" style="width:40px;">
+  <img src="/assets/images/dockerfile.png" style="width:40px;">
   </h2>
   As mentioned above, the Dockerfile is the file where we specify the environment that we want (the operating system, package repositories and versions). Sometimes, if we want to build and run a program or application (for instance, to run a Jupyter Notebook on some server), then we would also specify the necessary files, dependencies, configuration, and commands to run such program or application. 
 
@@ -144,7 +144,7 @@ CMD ["main.cpp", "-std=c++20", "-O2", "-o", "app"]</code></pre>
   
   <h2 style="display:flex; align-items:center; gap:20px;">
   2. The Docker image
-  <img src="../../assets/images/docker-image.png" style="width:50px;">
+  <img src="/cod-salmon.github.io/assets/images/docker-image.png" style="width:50px;">
   </h2>
     Once the Dockerfile is written, we can create the Docker image with:
     <pre><code>docker build -t &lt;image-name&gt;:&lt;tag&gt; &lt;path-to-dockerfile&gt; </code></pre>
@@ -165,7 +165,7 @@ CMD ["main.cpp", "-std=c++20", "-O2", "-o", "app"]</code></pre>
   
     <h2 style="display:flex; align-items:center; gap:20px;">
     2. The Docker container
-    <img src="../../assets/images/docker-container.png" style="width:50px;">
+    <img src="/cod-salmon.github.io/assets/images/docker-container.png" style="width:50px;">
     </h2>
     As mentioned before, the Docker container is the running instance of a Docker image. One can write:
     <pre><code class="nohighlight">docker run --name my-container &lt;image-name&gt:&lt;tag&gt </code></pre>
@@ -228,7 +228,7 @@ requests.get("http://cpp-container:5000/status") </code></pre>
     
     <h2 style="padding-top: 0px; padding-bottom: 0px; display:flex; align-items:center; gap:20px;">
     4. Docker Compose
-    <img src="../../assets/images/docker-compose.png" style="width:50px;">
+    <img src="/cod-salmon.github.io/assets/images/docker-compose.png" style="width:50px;">
     </h2>
 
     <p>
