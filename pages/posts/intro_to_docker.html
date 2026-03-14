@@ -1,0 +1,352 @@
+<main class="post-main">
+  <h1>Introduction to Docker</h1>
+  <div style="text-align:center;">
+    <img class="full-width-img" src="../../assets/images/docker-main.png">
+  </div>
+
+  <p>
+  When working in teams on the same project, it is painfully common to encounter environment-related issues. For example, a C++20 feature may compile perfectly on one developer's machine but fail in CI, or the same program may produce slightly different results depending on who runs it. 
+</p>
+<p>
+  That is... unless you use Docker. Docker removes those potential inconsistencies which affect reproducibility (coming from differences in operating systems, compiler versions, library dependencies, or build configurations), by allowing to build an image and having it shared and run between all developers and CI/CD servers - i.e. no more “why does it not work in my machine?”.
+</p>
+
+<p>
+  When I think about Docker, I like to picture a factory floor with different machines working together. Machines need to be designed, built, operated, and most importantly, orchestrated. With that analogy, I introduce four core concepts in Docker:
+</p>
+
+<ul>
+  <li>
+    <strong>The Dockerfile</strong>. This is a text file containing the instructions needed to build a development or runtime environment. It specifies the base system, the dependencies to install, and the commands to execute. In our factory analogy, the Dockerfile is like the design specification for a machine: it describes what the machine should contain and how it should behave.
+  </li>
+
+  <li>
+    <strong>The Docker image</strong>. This is the artifact produced when Docker builds the Dockerfile. It is a packaged snapshot of the environment defined by those instructions. Continuing with the analogy, the image is like the official assembly manual derived from the design specification. This manual can be shared with other factories so they can build identical machines.
+  </li>
+
+  <li>
+    <strong>The Docker container</strong>. This is a running instance of a Docker image. If the image is the assembly manual, the container is the actual machine built from it and currently operating on the factory floor.
+  </li>
+  <li>
+    <strong>Docker Compose</strong>. A tool for defining and running multiple containers together. In the factory analogy, Docker Compose acts like the production line manager: it decides which machines need to run, how they connect to each other, and in what configuration they should operate so the entire system works as a coordinated production line.
+  </li>
+</ul>
+
+  <h2 style="display:flex; align-items:center; gap:20px;">
+  1. The Docker file
+  <img src="../../assets/images/dockerfile.png" style="width:40px;">
+  </h2>
+  As mentioned above, the Dockerfile is the file where we specify the environment that we want (the operating system, package repositories and versions). Sometimes, if we want to build and run a program or application (for instance, to run a Jupyter Notebook on some server), then we would also specify the necessary files, dependencies, configuration, and commands to run such program or application. 
+
+  For instance, below we tell Docker that we want our workstation to run on an Ubuntu Linux 22.04 (Jammy Jellyfish) distro, with a set of tools like <code>git</code> (a software for version control), <code>python3</code> and <code>gcc</code>, <code>g++</code> and <code>make</code> (all these - and others - installed with the <code>build-essential</code> metapackage).
+  <pre><code>  # Start with Ubuntu Linux version 22.04
+  FROM ubuntu:22.04
+
+  # Avoid interactive prompts during package install
+  ENV DEBIAN_FRONTEND=noninteractive
+
+  # Update base system and install common utilities
+  RUN apt-get update && apt-get install -y \
+      git \
+      build-essential \
+      tzdata \
+      python3 \
+      && rm -rf /var/lib/apt/lists/*</code></pre>
+  </p>
+
+  Note here the option <code>-y</code> in <code>apt-get install -y</code> allows us to automatically anwer "yes" to confirmation prompts like “Do you want to continue? [Y/n]”. We need this in order to not have our build stopped because we need to answer that question to continue. Similarly, we set <code>DEBIAN_FRONTEND=noninteractive</code>, because some packages might require configuration during install and will try to open a prompt (for example, another package we're installing, <code>tzdata</code>, often asks you which timezone to use). 
+
+  <p>
+  Another thing to note is the <code>rm -rf /var/lib/apt/lists/*</code> bit at the end of the <code>apt-get install</code> command. This is often seen in Dockerfiles. The reason is that <code>apt-get update</code> is used in Linux to download metadata about packages (package names, versions, dependencies, etc.), so that <code>apt-get install</code> knows what to download and install. Once <code>apt-get install</code> is finished, that metadata (stored in <code>/var/lib/apt/lists/</code> by default) is no longer needed in the system, so we remove it. 
+  </p>
+
+  <p>
+  Other things you may find in a Dockerfile are <code>WORKDIR</code>, <code>COPY</code>, <code>CMD</code> and <code>ENTRYPOINT</code> instructions.
+  </p>
+
+  <h3><code>WORKDIR</code></h3>
+  <p>
+  <pre><code>WORKDIR &lt;working-directory&gt;</code></pre>
+  tells Docker to (first, create a directory called <code>&lt;working-directory&gt;</code> if it does not already exist and) <code>cd</code> into it. <code>&lt;working-directory&gt;</code> will be the starting directory when the image is launched and where commands run by default. If not specified, <code>WORKDIR</code> defaults to <code>/</code>. 
+  </p>
+
+  <h3><code>COPY</code></h3>
+  <p>
+  <pre><code>COPY &lt;src&gt; &lt;dest&gt;</code></pre>
+  
+  This is an important instruction in Dockerfile. It allows us to bring the files from our local filesystem (<code>&lt;src&gt;</code>), to the image filesystem (<code>&lt;dest&gt;</code>). Without <code>COPY</code> (or the a bit more complex <code>ADD</code> instruction), the Docker container won't be able to see your files. For instance, imagine you have the following directory layout:
+
+  <pre><code>my_project/
+  ├── Dockerfile
+  ├── main.cpp
+  └── main.py</code></pre>
+
+  To make these files available in the image filesystem, you need to do <code> main.py main.cpp .</code>, where <code>.</code> is the current working directory in the image environment. One often can find <code>COPY . .</code>, which copies all files in the current working directory in the local system to the current working directory in the image system.
+  </p>
+
+  <h3><code>CMD</code></h3>
+  <p>
+  <pre><code>CMD ["executable", "param1", "param2"]</code></pre>
+
+  <code>CMD</code> is another common instruction in Dockerfiles. While <code>RUN</code> is used during the image build (for installing software, compiling code, configuring the system), <code>CMD</code> is used once the image is built and the container starts. For example, to execute the <code>main.py</code> file we copied into the environment:
+  <pre><code>CMD ["python3", "main.py", "--verbose"]</code></pre>
+  </p>
+
+  <p>
+    Now, with all these, you can generate a Docker image and run a Docker container from it. When building the container, the <code>main.py</code> file will be executed, as instructed; and once running, the terminal will open, allowing you to run all sorts of commands. Obviously, the Docker container will successfully run those for which it has the correct programs; but for example, we could use <code>python3</code> to print a greetings message:
+    <pre><code>python3 -c "print('Hello from Docker')"</code></pre>
+   or we could use <code>g++</code> to compile our <code>main.cpp</code> file:
+    <pre><code>g++ main.cpp -std=c++20 --o app</code></pre>
+  </p>
+  <p>
+    This is where <code>ENTRYPOINT</code> comes in:
+  </p>
+  <h3><code>ENTRYPOINT</code></h3>
+  <p>
+  <pre><code>ENTRYPOINT ["executable", "arg1"]</code></pre>
+  It is used to narrow down runtime behaviour (limit what the docker container can do). It sets the "entry point" of any subsequent commands; or, in other words, the default first few words you will type from now on in any subsequent command. For example, I could write
+  <pre><code>ENTRYPOINT ["g++"]</code></pre>
+  meaning that from now on when interacting with the system I won't be typing just a <code>&lt;command&gt;</code>, but  <code>g++ &lt;command&gt;</code>. This way I can now write <code>main.cpp -std=c++20 -o app</code> (without <code>g++</code>) and I will be effectively inputting <code>g++ main.cpp -std=c++20 -o app</code> into the system. That could be once the docker container is running, typed into its terminal, or through a <code>CMD</code> instruction in the same Dockerfile as follows:
+  <pre><code>ENTRYPOINT ["g++"]
+CMD ["main.cpp", "-std=c++20", "-O2", "-o", "app"]</code></pre>
+  </p>
+  <p>
+    To show a complete example, below I put a Dockerfile which:
+    <ul>
+      <li>starts with a Ubuntu 22.04 distro,</li>
+      <li>installs g++ (C++ compiler)</li>
+      <li>copies a main.cpp file from the local current directory into the image's current working directory</li>
+      <li>compiles and runs the C++ program</li>
+    </ul>
+  </p>
+
+  <pre><code>  # Start with Ubuntu Linux version 22.04
+  FROM ubuntu:22.04
+
+  # Avoid interactive prompts during package install
+  ENV DEBIAN_FRONTEND=noninteractive
+
+  # Update base system and install C++ compiler
+  RUN apt-get update && apt-get install -y g++ \
+      && rm -rf /var/lib/apt/lists/*
+
+  # Set working directory
+  WORKDIR /app
+
+  # Copy source file into image
+  COPY main.cpp .
+
+  # Compile at build time 
+  RUN g++ main.cpp -std=c++20 -o app
+
+  # Run the compiled program (at run time)
+  CMD ["./app"]</code></pre>
+  
+  <h2 style="display:flex; align-items:center; gap:20px;">
+  2. The Docker image
+  <img src="../../assets/images/docker-image.png" style="width:50px;">
+  </h2>
+    Once the Dockerfile is written, we can create the Docker image with:
+    <pre><code>docker build -t &lt;image-name&gt;:&lt;tag&gt; &lt;path-to-dockerfile&gt; </code></pre>
+    
+    The Docker image is immutable - if you want to change the image, you need to re-write the Dockerfile and generate a different image from that file-; however, as shown above, it is versionable. To create different versions of the image <code>&lt;image-name&gt;</code> one can input different <code>&lt;tag&gt;</code> values (they will be different images, all with the same name but under different tags). 
+
+    Once built, you can share the Docker image. There are many ways to do this. For instance, you could (once logged in) push the image to Docker Hub:
+    <pre><code>docker push &lt;username&gt;/&lt;image-name&gt;:&lt;tag&gt;</code></pre>
+    
+    Then people can access it with:
+    <pre><code>docker pull &lt;username&gt;/&lt;image-name&gt;:&lt;tag&gt;</code></pre>
+    
+    (You could do something similar with the GitHub Container Registry instead). You could also save the image into a <code>.tar</code> file:
+    <pre><code>docker save -o &lt;image-name&gt;.tar &lt;image-name&gt;:&lt;tag&gt;  </code></pre>
+    
+    and share such file via some file-sharing method, like cloud storage. Then people can access it with:
+    <pre><code>docker load -i &lt;image-name&gt;.tar</code></pre>
+  
+    <h2 style="display:flex; align-items:center; gap:20px;">
+    2. The Docker container
+    <img src="../../assets/images/docker-container.png" style="width:50px;">
+    </h2>
+    As mentioned before, the Docker container is the running instance of a Docker image. One can write:
+    <pre><code class="nohighlight">docker run --name my-container &lt;image-name&gt:&lt;tag&gt </code></pre>
+    
+    and whatever was instructed to run in the Docker image, will start running in the <code>my-container</code> container. It is important to assign a name to the container, or to know the name of the container, because once done using it, you have to stop it from running:
+    <pre><code class="nohighlight">docker stop my-container</code></pre>
+    before you remove it from Docker:
+    <pre><code>docker rm my-container</code></pre>
+
+    Note that the above command won't remove the image; that can be done with:
+    <pre><code>docker rmi &lt;image-name&gt:&lt;tag&gt </code></pre>
+
+    <p>
+      A common practice when running containers is to attach a volume so that data generated inside the container can be stored outside of it. This allows results to persist even after the container stops or is removed. For example, with the command:
+      <pre><code>docker run --name my-container -v $(pwd)/outputs:/app &lt;image-name&gt:&lt;tag&gt</code></pre>
+      we are telling Docker to run a container named <code>my-container</code> from the image <code>&lt;image-name&gt:&lt;tag&gt</code>, while mounting the local directory <code>$(pwd)/outputs</code> to the working directory in the container, <code>/app</code>. This creates a mapping between the host system and the container, which allows any files generated in the <code>/app</code> of the Docker container to automatically appear in the local <code>$(pwd)/outputs</code> directory. 
+    </p>
+
+    <p>
+      Similar to the option <code>-v</code> above, which maps a folder on the host system to a folder in the container, the option <code>-p</code> maps a port on the host system to a port in the container. For instance:
+      <pre><code>docker run --name my-container -p 8080:80 &lt;image-name&gt:&lt;tag&gt</code></pre>
+      creates a network bridge so that requests sent to <code>localhost:8080</code> on the local machine are forwarded to port 80 inside the <code>my-container</code> container. This is useful, for example, when running services such as Jupyter Notebook.
+    </p>
+
+
+    <h3 style="padding-bottom:20px; padding-top:30px;">Multicontainer Applications - Building the Case for Docker Compose</h3>
+
+    Let us consider a more specific, realistic scenario. Suppose that the <code>main.cpp</code> file (the program located at <code>/app</code> inside the container) runs a simulation that generates data during execution. This data - let's say, a set of <code>.csv</code> files - is written to the container's working directory <code>/app</code>. We want to map this directory to a volume in the host system so that the data persists after the container is done running.
+
+    At the same time, we would like to analyse and visualise this data using a Jupyter notebook. Ideally, the notebook should also be able to query runtime metadata (such as simulation status or progress) from the running simulation while it is executing.
+
+    There are three ways one can do this:
+
+    <h4 style="padding-bottom:10px; padding-top:20px;">(a) Exposing the simulation through a host port</h4>
+    One approach is to expose the simulation C++ container through a host port and allow the Jupyter container to access it through the host machine. This can be done with two Docker commands:
+    <pre><code>docker run --name cpp-container -p 5000:5000 -v cpp-simulation-data:/app cpp-simulation-img</code></pre> 
+    which launches the C++ simulation container and exposes the API port; then, we start up the Jupyter notebook:
+    <pre><code>docker run --name jupyter-container -p 8888:8888 -v cpp-simulation-data:/data jupyter-notebook-img</code></pre> 
+    You can have something like this in your Jupyter notebook, which would be able to access the cpp simulation:
+    <pre><code class="nohighlight">import requests
+requests.get("http://host.docker.internal:5000/status")</code></pre> 
+
+    In this setting, communication between the containers is routed through the host system.
+    <h4 style="padding-bottom:10px; padding-top:20px;">(b) Allowing containers to communicate through a Docker network</h4>
+    A more robust solution is to allow the containers to communicate directly through a Docker network.
+    First, then, you create a network:
+    <pre><code>docker network create cpp-simulation-network </code></pre>
+    and now both containers can be attached to this network.
+    To run the simulation container we would write:
+    <pre><code>docker run --name cpp-container --network cpp-simulation-network -v cpp-simulation-data:/app cpp-simulation-img </code></pre>
+    and to run the Jupyter container:
+    <pre><code>docker run --name jupyter-container --network cpp-simulation-network -p 8888:8888 -v cpp-simulation-data:/data jupyter-notebook-img </code></pre>
+    Because both containers share the same Docker network, they can communicate directly using container names as hostnames. For example, the Jupyter notebook can access the simulation API with:
+    <pre><code class="nohighlight">import requests 
+requests.get("http://cpp-container:5000/status") </code></pre>
+    Note that the <code>-p 8888:8888</code> option is still used so that the Jupyter interface can be accessed from the host system through a web browser.
+    
+    <h4 style="padding-bottom: 10px; padding-top: 20px;">(c) Going smart and using Docker compose</h4>
+    See below!
+    
+    <h2 style="padding-top: 0px; padding-bottom: 0px; display:flex; align-items:center; gap:20px;">
+    4. Docker Compose
+    <img src="../../assets/images/docker-compose.png" style="width:50px;">
+    </h2>
+
+    <p>
+    As we have seen above, in real applications, a single container is rarely enough: we might need one container for our simulation code, another for a notebook environment, and perhaps others for databases or APIs. Managing all of these individually quickly becomes cumbersome. A more maintainable approach is to define the entire multi-container application in a Docker compose file. This is a configuration file where one can declare all services, networks and volumes they need for their application. Docker compose then takes this file and creates the required network and launches all services with the specified configuration. 
+    </p>
+
+    <p>
+    This is where <strong>Docker Compose</strong> becomes useful. Docker Compose allows us to define and run multiple containers as a single application using a configuration file. In that file we describe the services that make up our application, how they interact, and what resources they share.
+    </p>
+
+    <p>
+    Docker Compose files are typically saved as <code>compose.yaml</code> or <code>docker-compose.yml</code>. Below is a simple Compose file we could use for our example:
+    </p>
+    
+    <pre><code>version: "3.9"
+
+services:
+
+  cpp-container:
+    image: cpp-simulation-img
+    volumes:
+      - cpp-simulation-data:/app
+
+  jupyter-container:
+    image: jupyter-notebook-img
+    ports:
+      - "8888:8888"
+    volumes:
+      - cpp-simulation-data:/data
+    depends_on:
+      - cpp-simulation
+
+volumes:
+  cpp-simulation-data:</pre></code>
+
+  <p>It contains some basic keywords:</p>
+
+  <h3><code>version</code></h3>
+  <p>
+  This is used to specify the Compose file format version. It determines which features and syntax are available. However, newer Compose implementations may ignore this.
+  </p>
+  <h3><code>services</code></h3>
+  <p>
+  This is the building block of a Compose file. Each service defines one container (or a set of identical containers) that is part of the application and includes many configuration options:
+  </p>
+  <h3><code>container-name</code></h3>
+  <p>
+  In our example above, we specify the name of the containers we use for our service: <code>cpp-container</code> and <code>jupyter-container</code>.
+  </p>
+  <h3><code>image</code></h3>
+  <p>
+  Specifies the Docker image used to create the container. Alternatively, you can create the image out of a Dockerfile, with (for example):
+  <pre><code>cpp-container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - cpp-simulation-data:/app</pre></code>
+  </p>
+  <h3><code>ports</code></h3>  
+  <p>
+  Used to maps a host port to a container port, following the format <code>HOST_PORT:CONTAINER_PORT</code>
+  </p>
+  <h3><code>volumes</code></h3> 
+  <p>
+  Used to mount persistent storage inside the container, following the format <code>VOLUME_NAME:CONTAINER_PATH</code>. Note this is different from the <code>volumes</code> keyword which can find at the bottom of the compose file. That is used to create a managed Docker volume, which (unlike the volumes we mount inside a specific service) can be shared between services.
+  </p>
+  <h3><code>depends_on</code></h3> 
+  <p>Used to make sure that one service starts after another - for our case, for example, we want <code>jupyter-container</code> to start after <code>cpp-container</code></p>
+  <h3><code>command</code></h3> 
+  <p>
+  This is not in the example file above, but it is very common to find. It is used to override the default command defined in the Docker image of the service. For example, we could have:
+  <pre><code>cpp-container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - cpp-simulation-data:/app
+    command: ./app</pre></code></p>
+  <h3><code>environment</code></h3>
+  <p>
+  This is also not in the example file above, but it is very useful when wanting to define some environment variables inside the container. For example:
+  <pre><code>cpp-container:
+    image: cpp-simulation-img
+    volumes:
+      - cpp-simulation-data:/app
+    environment:
+      - MODE=production
+      - API_PORT=5000</pre></code></p>
+  
+  <h3><code>networks</code></h3>
+  <p>
+  I have not added this in the compose file as Docker compose automatically generates one. However, if you wish to define a custom network, you can write (outside the <code>services</code> section):
+  <pre><code>networks:
+  cpp-simulation-network :</pre></code>
+  and then services can join the specific network with:
+  <pre><code>services:
+  cpp-simulation:
+    networks:
+      - cpp-simulation-network </pre></code>
+  </p>
+  <p>
+    Once your Docker images (or Dockerfiles) and your Compose configuration are ready, running the entire application is straightforward. Instead of starting containers individually, Docker Compose allows you to launch the full system with a single command:
+    </p>
+
+    <pre><code>docker compose up</code></pre>
+
+    <p>
+    This command builds images (when necessary), creates the containers, configures the networks and volumes, and starts all services defined in the Compose file.
+    </p>
+
+    <p>
+    When you are done, everything can be stopped and cleaned up just as easily:
+    </p>
+
+    <pre><code>docker compose down</code></pre>
+
+    <p style="padding-top: 20px;">
+    Docker is, in conclusion, amazing. It provides a very convenient way to reproduce and share complete application environments. By describing the services, dependencies, and resources in a single file, teams can run the same multi-container setup locally, in CI pipelines, or on other machines with very little effort.
+    </p>
+<main>

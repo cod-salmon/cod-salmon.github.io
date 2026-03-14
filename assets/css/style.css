@@ -34,7 +34,11 @@ main{
 }
 /* In all p elements inside a main element, apply a margin on the top*/
 main p{
-  margin-top: .35em;
+  margin-top: .55em;
+}
+/* Apply some padding after page title*/
+main h1 {
+  padding-bottom: 40px;
 }
 /* Style button elements*/
 button{
@@ -509,7 +513,7 @@ and some content (the content consisting of text and a "Read More" link*/
   display: flex; /* flex container, default to row direction*/
   flex-direction: row; /* image left, content right */
 
-  width: 800px; /* set a fixed width*/
+  width: 900px; /* set a fixed width*/
   max-width: 100%; /* to prevent overflow*/
   margin: 0 auto; /* no top/bottom margin, center card horizontally */
   
@@ -527,7 +531,7 @@ and some content (the content consisting of text and a "Read More" link*/
 }
 /*-- THUMBNAIL --*/
 .project-card .thumbnail {
-  width: 200px; /* set a fixed width to thumbnail*/
+  width: 300px; /* set a fixed width to thumbnail*/
   aspect-ratio: 1 / 1; /* make it square*/
   overflow: hidden; /* make sure things that go outside its bounds are hidden*/
 }
@@ -599,5 +603,5 @@ with image on top and content and links below*/
 }
 /* "GitHub" link */
 .links a.github-link {
-  color: var(--text-color); /* GitHub brand dark gray */
+  color: #007bff; /* GitHub brand dark gray */
 }
