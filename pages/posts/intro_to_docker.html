@@ -1,7 +1,7 @@
 <main class="post-main">
   <h1>Introduction to Docker</h1>
   <div style="text-align:center;">
-    <img class="full-width-img" src="/cod-salmon.github.io/assets/images/docker-main.png">
+    <img class="full-width-img" src="/assets/images/docker-main.png">
   </div>
 
   <p>
@@ -144,7 +144,7 @@ CMD ["main.cpp", "-std=c++20", "-O2", "-o", "app"]</code></pre>
   
   <h2 style="display:flex; align-items:center; gap:20px;">
   2. The Docker image
-  <img src="/cod-salmon.github.io/assets/images/docker-image.png" style="width:50px;">
+  <img src="/assets/images/docker-image.png" style="width:50px;">
   </h2>
     Once the Dockerfile is written, we can create the Docker image with:
     <pre><code>docker build -t &lt;image-name&gt;:&lt;tag&gt; &lt;path-to-dockerfile&gt; </code></pre>
@@ -165,7 +165,7 @@ CMD ["main.cpp", "-std=c++20", "-O2", "-o", "app"]</code></pre>
   
     <h2 style="display:flex; align-items:center; gap:20px;">
     2. The Docker container
-    <img src="/cod-salmon.github.io/assets/images/docker-container.png" style="width:50px;">
+    <img src="/assets/images/docker-container.png" style="width:50px;">
     </h2>
     As mentioned before, the Docker container is the running instance of a Docker image. One can write:
     <pre><code class="nohighlight">docker run --name my-container &lt;image-name&gt:&lt;tag&gt </code></pre>
@@ -228,7 +228,7 @@ requests.get("http://cpp-container:5000/status") </code></pre>
     
     <h2 style="padding-top: 0px; padding-bottom: 0px; display:flex; align-items:center; gap:20px;">
     4. Docker Compose
-    <img src="/cod-salmon.github.io/assets/images/docker-compose.png" style="width:50px;">
+    <img src="/assets/images/docker-compose.png" style="width:50px;">
     </h2>
 
     <p>
