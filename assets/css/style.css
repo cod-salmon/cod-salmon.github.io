@@ -495,6 +495,17 @@ and some content (the content consisting of text and a "Read More" link*/
     grid-template-columns: 1fr;
   }
 }
+/*I add these settings so that I can grey out postcard when is in progress*/
+.post-wip {
+  opacity: 0.6;
+}
+.post-wip .thumbnail img {
+  filter: grayscale(80%);
+}
+.post-wip .read-more {
+  pointer-events: none; /*make it non-clickable!*/
+  opacity: 0.7;
+}
 /*-----------------------------------------------------------------------------*/
 /*------------------------ PROJECT CARD GRID SETTINGS- ------------------------*/
 /*-----------------------------------------------------------------------------*/

@@ -25,6 +25,30 @@
     </div>
   </div>
 
+  <!-- POST-CARD 2-->
+  <div class="post-card post-wip">
+    <!-- POST-CARD IMAGE -->
+    <div class="thumbnail">
+      <img src="/assets/images/latency-bf16.png" atl="">
+    </div>
+    <!-- POST-CARD CONTENT -->
+    <div class="post-card-content">
+      <h3>12/02/2023 - <span class="reading-time"></span> min read</h3>
+      <h2>Floating-Point Formats and LLM Latency: <code>binary32</code>, <code>binary16</code>, and <code>bfloat16</code></h2>
+      <p>
+        In this post, I examine the <code>binary32</code> floating-point format—how numbers are encoded in memory and how its bits represent real values. I also compare it with the lower-precision <code>binary16</code> and <code>bfloat16</code> formats, highlighting differences in bit layout, precision, and dynamic range. Finally (maybe the most interesting bit), I discuss how these formats affect latency during inference in LLM-powered applications.
+      </p>
+      <!-- Post-card links (Read More) -->
+      <div class="links">
+        <a href="#" 
+          onclick="loadContent('./pages/posts/floating_formats_llm.html', this)" 
+          class="read-more"
+          data-article="./pages/posts/floating_formats_llm.html">
+          Read More
+        </a>
+      </div>
+    </div>
+  </div>
   <!-- etc. -->
 
 </div>
