@@ -368,6 +368,7 @@ when the side navigation bar shows (in mobile mode)*/
   position: relative; /* settings this to be able to position children
   absolutely inside it*/
   padding-bottom: 100px; /* do not let content touch bottom edge*/
+  text-align: justify; /*make content text spread out horizontally*/
 }
 /* I use this for titles*/
 .post-main h1 {
@@ -387,6 +388,9 @@ when the side navigation bar shows (in mobile mode)*/
   line-height: 1.6; /*vertical spacing between list lines*/
   padding-left: 40px; /* add some indentation*/
   margin-bottom: 10px;  /* add spacing after list*/
+}
+li {
+  margin-bottom: 8px; /*set some spacing between list items*/
 }
 .post-main img {
   max-width: 100%; /* expand across whole width of the container*/
