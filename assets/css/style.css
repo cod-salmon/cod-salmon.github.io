@@ -591,11 +591,6 @@ and some content (the content consisting of text and a "Read More" link*/
   color: #777;           /* dim text */
   background-color: #f0f0f0; /* optional subtle background dim */
 }
-/* Exclude links from greyscale/opacity */
-.project-card-content.in-progress .links a {
-  filter: none;
-  color: #0366d6;       /* GitHub link blue */
-}
 /* When image is less than 700px, arrange project card vertically,
 with image on top and content and links below*/
 @media (max-width: 700px) {
