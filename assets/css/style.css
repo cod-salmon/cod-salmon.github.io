@@ -585,6 +585,11 @@ and some content (the content consisting of text and a "Read More" link*/
   line-height: 1.6;
   margin-bottom: 5px;
 }
+/* Grey out project-card if in progress*/
+.project-card-content.in-progress {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
 /* When image is less than 700px, arrange project card vertically,
 with image on top and content and links below*/
 @media (max-width: 700px) {
