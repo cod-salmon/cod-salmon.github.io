@@ -590,6 +590,11 @@ and some content (the content consisting of text and a "Read More" link*/
   opacity: 0.5;
   filter: grayscale(100%);
 }
+/* Exclude links from greyscale/opacity */
+.project-card-content.in-progress .links a {
+  opacity: 1;          /* full visibility */
+  filter: none;        /* restore original color */
+}
 /* When image is less than 700px, arrange project card vertically,
 with image on top and content and links below*/
 @media (max-width: 700px) {
