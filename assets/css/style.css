@@ -566,7 +566,6 @@ and some content (the content consisting of text and a "Read More" link*/
   flex-direction: column; /*stack elements vertically
   (headings, paragraphs, etc.)*/
   gap: 0.5rem; /* vertical spacing */
-  /* remove justify-content */
 }
 /* Style the content - nothing crrazy here*/
 /* Heading settings for post-card content */
@@ -585,6 +584,7 @@ and some content (the content consisting of text and a "Read More" link*/
   font-size: 1rem; /* small font-size*/
   line-height: 1.6;
   margin-bottom: 5px;
+  text-align: justify;
 }
 /* When image is less than 700px, arrange project card vertically,
 with image on top and content and links below*/
