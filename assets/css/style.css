@@ -565,7 +565,8 @@ and some content (the content consisting of text and a "Read More" link*/
   can stack elements vertically*/
   flex-direction: column; /*stack elements vertically
   (headings, paragraphs, etc.)*/
-  justify-content: space-between; /*spread out elements in stack*/
+  gap: 0.5rem; /* vertical spacing */
+  /* remove justify-content */
 }
 /* Style the content - nothing crrazy here*/
 /* Heading settings for post-card content */
